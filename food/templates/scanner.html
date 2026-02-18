@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Entry Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #e8fee1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h2 {
+            margin: 15px 0 10px 0;
+            font-size: 22px;
+        }
+
+        .controls {
+            width: 95%;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        select {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: rgb(156, 255, 158);
+        }
+
+        #reader {
+            width: 95%;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        #resultBox {
+            width: 95%;
+            margin-top: 15px;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .duplicate {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .error {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                max-width: 450px;
+                margin: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<h1 style="color: #28a745;">MAGSCON - 2026</h1>
+<h2 style="color: #ff9800;">Food Entry QR Scanner</h2>
+<p style="color: #555;">Select the day and meal, then scan the QR code of the participant.</p>
+
+<div class="controls">
+    <select id="day">
+        <option value="1">Day 1</option>
+        <option value="2">Day 2</option>
+        <option value="3">Day 3</option>
+    </select>
+
+    <select id="meal">
+        <option value="snack1">Snack 1</option>
+        <option value="lunch">Lunch</option>
+        <option value="snack2">Snack 2</option>
+        <option value="dinner">Dinner</option>
+    </select>
+</div>
+
+
+<div id="reader"></div>
+
+<div id="resultBox"></div>
+    <div class="footer">
+        Event QR System <br>
+        Developed by Team MAGSCON
+    </div>
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+let scanner = new Html5Qrcode("reader");
+
+function startScanner() {
+
+    Html5Qrcode.getCameras().then(devices => {
+
+        if (devices && devices.length) {
+
+            // Try to find back camera
+            let backCamera = devices.find(device =>
+                device.label.toLowerCase().includes('back') ||
+                device.label.toLowerCase().includes('rear') ||
+                device.label.toLowerCase().includes('environment')
+            );
+
+            let cameraId = backCamera ? backCamera.id : devices[0].id;
+
+            scanner.start(
+                cameraId,
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess
+            );
+
+        }
+    }).catch(err => {
+        console.error("Camera access error:", err);
+    });
+}
+
+function stopScanner() {
+    scanner.stop().catch(() => {});
+}
+
+function showResult(message, status) {
+    let box = document.getElementById("resultBox");
+    box.innerText = message;
+    box.className = status;
+    box.style.display = "block";
+
+    setTimeout(() => {
+        box.style.display = "none";
+        startScanner();
+    }, 2000);
+}
+
+function onScanSuccess(decodedText) {
+
+    stopScanner();
+
+    fetch("/verify/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrftoken
+        },
+        body: `qr_data=${decodedText}&day=${document.getElementById("day").value}&meal=${document.getElementById("meal").value}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        showResult(data.message, data.status);
+    })
+    .catch(() => {
+        showResult("Server Error", "error");
+    });
+}
+
+startScanner();
+
+</script>
+
+
+</body>
+</html>

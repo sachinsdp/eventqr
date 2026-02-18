@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Dashboard</title>
+    <style>
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 20px;
+        }
+
+        th, td {
+            padding: 10px 20px;
+            border: 1px solid black;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Live Food Counter Dashboard</h2>
+
+<table>
+    <tr>
+        <th>Day</th>
+        <th>Meal</th>
+        <th>Total Served</th>
+    </tr>
+
+    {% for row in stats %}
+    <tr>
+        <td>Day {{ row.day }}</td>
+        <td>{{ row.meal }}</td>
+        <td>{{ row.total }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>
