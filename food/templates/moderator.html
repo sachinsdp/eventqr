@@ -1,0 +1,15 @@
+<h2>Audience Questions</h2>
+
+{% for q in questions %}
+
+<div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
+
+<b>{{ q.to }}</b><br>
+<p style="color: green;">{{ q.question }}</p>
+<small style="color: blueviolet;">{{ q.reg_id }} | {{ q.created_at }}</small>
+
+</div>
+
+{% endfor %}
+
+

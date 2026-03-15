@@ -2,12 +2,13 @@ import qrcode
 import os
 import re
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Participant, MealScan
+from .models import Participant, MealScan, Question
 from io import BytesIO
 from django.http import HttpResponse
 from django.db.models import Count
+
 
 
 EVENT_PREFIX = "EVENT2026"
@@ -65,6 +66,7 @@ def scanner_page(request):
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Participant, MealScan
+
 
 EVENT_PREFIX = "EVENT2026"
 
@@ -142,3 +144,44 @@ def verify_scan(request):
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": "Something went wrong"})
+
+
+
+
+from django.shortcuts import render
+from .models import Panel, Panelist, Question
+
+
+def submit_question(request, panel_id):
+
+    panel = Panel.objects.get(id=panel_id)
+    panelists = Panelist.objects.filter(panel=panel)
+
+    if request.method == "POST":
+
+        regid = request.POST.get("regid")
+        to = request.POST.get("to")
+        question = request.POST.get("question")
+
+        Question.objects.create(
+            panel=panel,
+            reg_id=regid,
+            to=to,
+            question=question
+        )
+
+        return render(request, "thankyou.html")
+
+    context = {
+        "panel": panel,
+        "panelists": panelists
+    }
+
+    return render(request, "panel.html", context)
+
+
+def moderator_view(request):
+
+    questions = Question.objects.all().order_by("-created_at")
+
+    return render(request, "moderator.html", {"questions": questions})

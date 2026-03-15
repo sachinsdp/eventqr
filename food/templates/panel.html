@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panel Discussion Q&A</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+font-family: "Segoe UI", Arial, sans-serif;
+margin:0;
+background:linear-gradient(135deg,#eef2f7,#d9e3f2);
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.container{
+max-width:500px;
+width:95%;
+background:white;
+border-radius:12px;
+padding:25px;
+box-shadow:0 10px 30px rgba(0,0,0,0.15);
+animation:fadeIn 0.6s ease;
+}
+
+h2{
+text-align:center;
+margin-top:0;
+color:#1f3c88;
+letter-spacing:1px;
+}
+
+.subtitle{
+text-align:center;
+font-size:14px;
+color:#666;
+margin-bottom:20px;
+}
+
+.panel-members{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:25px;
+}
+
+.member{
+background:linear-gradient(135deg,#4e73df,#2d7efb);
+color:white;
+padding:12px;
+border-radius:8px;
+text-align:center;
+font-weight:600;
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+transition:transform 0.2s;
+}
+
+.member:hover{
+transform:scale(1.05);
+}
+
+.question-form label{
+display:block;
+font-weight:600;
+margin-bottom:6px;
+margin-top:10px;
+font-size:14px;
+}
+
+.question-form input,
+.question-form select,
+.question-form textarea{
+
+width:100%;
+padding:10px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:14px;
+transition:all 0.2s;
+}
+
+.question-form input:focus,
+.question-form select:focus,
+.question-form textarea:focus{
+
+border-color:#2d7efb;
+outline:none;
+box-shadow:0 0 4px rgba(45,126,251,0.4);
+}
+
+textarea{
+resize:none;
+}
+
+button{
+
+width:100%;
+margin-top:18px;
+padding:12px;
+background:linear-gradient(135deg,#2d7efb,#4e73df);
+border:none;
+border-radius:6px;
+font-size:16px;
+font-weight:bold;
+color:white;
+cursor:pointer;
+transition:all 0.25s;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 6px 14px rgba(0,0,0,0.2);
+}
+
+.footer{
+text-align:center;
+margin-top:18px;
+font-size:12px;
+color:#888;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(15px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@media(max-width:500px){
+
+.panel-members{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+<h2>Panel Discussion Q&A</h2>
+
+
+
+<form class="question-form" method="POST">
+
+{% csrf_token %}
+
+<label>Your Registration ID</label>
+<input type="text" name="regid" required maxlength="20" placeholder="Enter your registration ID">
+
+<label>Ask Question To</label>
+
+<h2>{{ panel.name }}</h2>
+<div class="subtitle">Day {{ panel.day }}</div>
+
+
+<div class="panel-members">
+
+{% for p in panelists %}
+
+<div class="member">
+{{ p.name }}
+</div>
+
+{% endfor %}
+
+</div>
+
+<select name="to" required>
+
+<option value="panel">Entire Panel</option>
+
+{% for p in panelists %}
+
+<option value="{{ p.name }}">{{ p.name }}</option>
+
+{% endfor %}
+
+</select>
+
+<label>Your Question</label>
+
+<textarea name="question" rows="3" required placeholder="Type your question here..."></textarea>
+
+<button type="submit">Submit Question</button>
+
+</form>
+
+<div class="footer">
+Your question will be reviewed by the moderator.
+</div>
+
+</div>
+
+</body>
+</html>
