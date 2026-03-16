@@ -55,8 +55,8 @@ margin-bottom:25px;
 }
 
 .member{
-background:linear-gradient(135deg,#4e73df,#2d7efb);
-color:white;
+background:linear-gradient(135deg,#c2d1fe,#a2ea8c);
+color:rgb(60, 60, 60);
 padding:12px;
 border-radius:8px;
 text-align:center;
@@ -161,10 +161,10 @@ grid-template-columns:1fr;
 <label>Your Registration ID</label>
 <input type="text" name="regid" required maxlength="20" placeholder="Enter your registration ID">
 
-<label>Ask Question To</label>
+<label>Ask Question to the Panel:</label>
 
-<h2>{{ panel.name }}</h2>
-<div class="subtitle">Day {{ panel.day }}</div>
+<h3 style="color: brown;">{{ panel.name }}</h3>
+<!--div class="subtitle">Day {{ panel.day }}</div-->
 
 
 <div class="panel-members">
