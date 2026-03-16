@@ -8,7 +8,7 @@ from .models import Participant, MealScan, Question
 from io import BytesIO
 from django.http import HttpResponse
 from django.db.models import Count
-
+from django.contrib.auth.decorators import login_required
 
 
 EVENT_PREFIX = "EVENT2026"
@@ -25,6 +25,7 @@ def dashboard(request):
 
     return render(request, "dashboard.html", {"stats": stats})
 
+@login_required
 def generate_qr(request):
 
     if request.method == "POST":
